@@ -50,30 +50,7 @@ public class DataPreparationTool {
 			if(tra!=0){
 				getTrainingData(tra);//calls a data split if entry is not = 0
 			}
-			//getTrainingInstances();
 		}
-
-		/*this works*/
-		//	System.out.println(trainingInstances.size());
-		//System.out.println(trainingInstances.size());
-
-		//	Instance.setSortAttribute(0); //this works now.....
-		//		Collections.sort(trainingInstances);
-		//		for(Instance a: trainingInstances){
-		//			System.out.println(a.toString());
-		//		}
-		//Collections.sort(trainingInstances);
-		//Testing parsed output
-		//
-		//		System.out.println("\nPrinting Test Dataset of "+testData.size()+" elements");
-		//		for (int x =0; x< testData.size(); x++){
-		//			System.out.println(x+1 +". "+Arrays.toString(testData.get(x)));
-		//		}
-		//
-		//		System.out.println("\n\nPrinting Training Dataset of "+trainingData.size()+" elements");
-		//		for (int x =0; x< trainingData.size(); x++){
-		//			System.out.println(x+1 +". "+Arrays.toString(trainingData.get(x)));
-		//		}
 
 	}
 	public List<String[]> getTrainingData(double tr){
@@ -87,29 +64,24 @@ public class DataPreparationTool {
 	}
 
 	public List<Instance> getTrainingInstances(){
+
 		trainingInstances = new ArrayList<>();
 		int x = trainingData.get(0).length;
 
 		for(String[] inst : trainingData){
-
 			Object instance[] = new Object[x];
 			for(int i = 0; i<x;i++){
 				//parses input to double if possible, else it's a string
 				if(isNumber(inst[i])){
 					instance[i] = Double.parseDouble(inst[i]);
-					//System.out.println(instance[i].getClass());
 				}else{
 					instance[i] = inst[i];
-					//System.out.println(instance[i].getClass());
 				}
 			}
 			trainingInstances.add(new Instance(instance));
 		}
-
 		return trainingInstances;
-
 	}
-
 
 	public List<Instance> getTestInstances(){
 		testInstances = new ArrayList<>();
@@ -127,16 +99,12 @@ public class DataPreparationTool {
 			}
 			testInstances.add(new Instance(instance));
 		}
-
-
 		return testInstances;
-
 	}
-	public List<String[]> getTrainingAttributes(List<String[]> tr){
 
+	public List<String[]> getTrainingAttributes(List<String[]> tr){
 		return trainingAttributes;
 	}
-
 
 	public List<String[]> getTestAttributes(){
 		return testAttributes;
@@ -144,7 +112,6 @@ public class DataPreparationTool {
 
 	@SuppressWarnings("deprecation")
 	public boolean isNumber(String s){
-
 		return NumberUtils.isNumber(s);
 	}
 

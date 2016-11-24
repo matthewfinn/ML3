@@ -2,14 +2,20 @@ package ie.nuigalway;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 public class C45 {
 
 	String[] attributes;
-	List<Instance> train;
-	List<Instance> test;
-	List<List<Double>> attSplits;
-	List<List<Integer>> attSplitCount;
+	List<Node> nodes;
+	//	List<Instance> train;
+	//	List<Instance> test;
+	//	HashMap<String,Integer> targetCount; //hashmap that holds the number of each instance 'type'
+	//
+	//	List<List<Double>> attSV; //List that holds lists of 'split' values for each sorting order of the training instances
+	//	List<List<String>> attST; //List that holds lists of instance type values for each split in each ordering of training instances
+	//	List<List<Integer>> attSC; //List that holds lists of instance type counts before each split for each split in each ordering of training instances
+	//	List<HashMap<String,Double>> entropyValues;
 	/**
 	 * This algorithm has a few base cases.
 
@@ -28,76 +34,127 @@ public class C45 {
 	public C45(String[] atts, List<Instance> tr, List<Instance> tst){
 
 		attributes = atts;
-		train = tr;
-		test = tst;
-		attSplits = new ArrayList<List<Double>>();
-		attSplitCount = new ArrayList<List<Integer>>();
+		if(tr!=null){
+			Node node = new Node(tr);
+
+			runC45(node);
+		}
+
 	}
 
 
-	public void runC45(){
+	public void runC45(Node node){
+
 
 		//gets the data splits for each attribute and count
-		int x = train.get(0).getAttributes().length - 1;
+		int x = node.getData().get(0).getAttributes().length - 1;
+
 		for (int i = 0; i < x; i++){
 			System.out.println("Sorted by: "+attributes[i]);
 			Instance.setSortAttribute(i);
-			Collections.sort(train);
+			Collections.sort(node.getData());
 
-			for(Instance a: train){
+			thresholdSplit(node, i);
+
+			for(Instance a: node.getData()){
 				System.out.println(a.toString());
 			}
-			thresholdSplit(train, i);
-			System.out.println(attSplits.get(i).toString());
-			System.out.println(attSplitCount.get(i).toString());
+			System.out.println("Instance types calculated: "+ node.getattST().get(i).toString());
+			System.out.println("Instance type count calculated: "+ node.getattSC().get(i).toString());
+			System.out.println("Midpoints calculated: "+ node.getattSV().get(i).toString());
+		}
+		System.out.println("Number of each type of owl: "+countInstances(node));
+	}
+
+	public HashMap<String,Integer> countInstances(Node node){
+		//Counts the instance of each target value in the dataset
+
+		HashMap<String,Integer> targetCount = new HashMap<String, Integer>();
+
+		String [] counter = new String[node.getData().size()];
+		int c = 0;
+		for(Instance in: node.getData()){
+
+			counter[c]= in.getType();
+			c++;
+		}
+		for(String s: counter){
+			if (targetCount.containsKey(s)){
+				targetCount.put(s, targetCount.get(s) + 1);
+			}else{
+				targetCount.put(s,new Integer(1));
+			}
 		}
 
-		//System.out.println(attSplits.toString());
-
-
+		node.setTargetCount(targetCount);
+		return targetCount;
 
 	}
 
-	public double calculateEntropy(List<Instance> i){
-		int set = train.size();
 
-
-		return 0;
-	}
-
-	public double calculateIG(){
-		return 0;
-	}
-
-	public List<Double> thresholdSplit(List<Instance> tr, int i){
+	public List<Double> thresholdSplit(Node node, int i){
 
 		List<Double> splits = new ArrayList<Double>();
 		List<Integer> splitCount = new ArrayList<Integer>();
-		int tar = tr.get(0).getAttributes().length-1;
+		List<String> splitType = new ArrayList<String>();
+		int tar = node.getData().get(0).getAttributes().length-1;
 		int count = 0;
 
-		for(int y = 0; y < tr.size()-1; y++){
+		for(int y = 0; y < node.getData().size()-1; y++){
 
-			String current = tr.get(y).getType();
-			String next =  tr.get(y+1).getType();
+			String current = node.getData().get(y).getType();
+			String next =  node.getData().get(y+1).getType();
 
 			count++;
 			if(!current.equals(next)){
 				//int count = y+1;
-				Double split = ((Double) (tr.get(y).getAttributes()[i]) + (Double)(tr.get(y+1).getAttributes()[i]))/2;
+				Double split = ((Double) (node.getData().get(y).getAttributes()[i]) + (Double)(node.getData().get(y+1).getAttributes()[i]))/2;
 				splits.add(split);
 				splitCount.add(count);
+				splitType.add(current);
 				count=0;
 			}
 
 		}
-		attSplits.add(splits);
-		attSplitCount.add(splitCount);
+		List<List<Double>> asv = node.getattSV();
+		asv.add(splits);
+		node.setattSV(asv);
+
+		List<List<Integer>> asc = node.getattSC();
+		asc.add(splitCount);
+		node.setattSC(asc);
+
+		List<List<String>> ast = node.getattST();
+		ast.add(splitType);
+		node.setattST(ast);
 
 		return null;
 
 	}
 
+	public double calculateEntropys(Node node){
+
+		for(List<Double> a : node.getattSV() ){
+
+			for (int l=0; l< a.size(); l++){
+
+				a.get(l);
+			}
+
+		}
+
+
+		// y/numAllInstanceB4split * log base 2 (y/
+
+
+		return 0;
+	}
+
+
+
+	public double calculateIG(){
+		return 0;
+	}
 
 	public void train(){
 
