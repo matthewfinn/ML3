@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 public class C45 {
 
 	String[] attributes;
@@ -19,9 +20,7 @@ public class C45 {
 	/**
 	 * This algorithm has a few base cases.
 
-		1. All the samples in the list belong to the same class. When this happens, it simply creates a leaf node for the decision tree saying to choose that class.
-		2. None of the features provide any information gain. In this case, C4.5 creates a decision node higher up the tree using the expected value of the class.
-		3. Instance of previously-unseen class encountered. Again, C4.5 creates a decision node higher up the tree using the expected value.
+
 
 
 		Check for the above base cases.
@@ -39,7 +38,13 @@ public class C45 {
 
 			runC45(node);
 		}
+	}
 
+	public void checkBaseCases(){
+
+		//		1. All the samples in the list belong to the same class. When this happens, it simply creates a leaf node for the decision tree saying to choose that class.
+		//		2. None of the features provide any information gain. In this case, C4.5 creates a decision node higher up the tree using the expected value of the class.
+		//		3. Instance of previously-unseen class encountered. Again, C4.5 creates a decision node higher up the tree using the expected value.
 	}
 
 
@@ -50,20 +55,22 @@ public class C45 {
 		int x = node.getData().get(0).getAttributes().length - 1;
 
 		for (int i = 0; i < x; i++){
-			System.out.println("Sorted by: "+attributes[i]);
+			//			System.out.println("Sorted by: "+attributes[i]);
 			Instance.setSortAttribute(i);
 			Collections.sort(node.getData());
 
+			countInstances(node);
 			thresholdSplit(node, i);
+			calculateEntropys(node);
 
-			for(Instance a: node.getData()){
-				System.out.println(a.toString());
-			}
-			System.out.println("Instance types calculated: "+ node.getattST().get(i).toString());
-			System.out.println("Instance type count calculated: "+ node.getattSC().get(i).toString());
-			System.out.println("Midpoints calculated: "+ node.getattSV().get(i).toString());
+			//			for(Instance a: node.getData()){
+			//				System.out.println(a.toString());
+			//			}
+			//			System.out.println("Instance types calculated: "+ node.getattST().get(i).toString());
+			//			System.out.println("Instance type count calculated: "+ node.getattSC().get(i).toString());
+			//			System.out.println("Midpoints calculated: "+ node.getattSV().get(i).toString());
+			//			System.out.println(node.getTargetCount());
 		}
-		System.out.println("Number of each type of owl: "+countInstances(node));
 	}
 
 	public HashMap<String,Integer> countInstances(Node node){
@@ -134,25 +141,79 @@ public class C45 {
 
 	public double calculateEntropys(Node node){
 
-		for(List<Double> a : node.getattSV() ){
+		//get list of lists of split values
+		//get list of lists of split types
+		//get list of lists of counts before split for each target
+		//Generate List of counts after split for each target
+		//iterate for each numerical attribute
 
-			for (int l=0; l< a.size(); l++){
+		Map<String, Integer> map = node.getTargetCount();
 
-				a.get(l);
+		int count = node.getattSV().size();
+		int y = node.getData().size();
+
+		List<List<Double>> splitValues = node.getattSV();
+		List<List<String>> attST = node.getattST(); //List that holds lists of instance type values for each split in each ordering of training instances
+		List<List<Integer>> attSC = node.getattSC(); //
+		int x = 0;
+		for(List<Double> a: splitValues){
+
+			System.out.println("CALCULATING ENTROPY OF SPLITS "+ attributes[x]+"\n\n");
+
+			List<String> targets = attST.get(x);
+			List<Integer> targetCount = attSC.get(x);
+			Map<String,Integer> beforeSplit = new HashMap();
+			Map<String,Integer> afterSplit = new HashMap();
+			for(String tar: map.keySet()){ //puts each target value in the hashmap
+				beforeSplit.put(tar, 0);
+				afterSplit.put(tar, map.get(tar));
+
 			}
 
+			for(int i = 0 ; i < a.size(); i ++){
+
+
+				String target = targets.get(i);
+				int tarCount = targetCount.get(i);
+				beforeSplit.put(target, beforeSplit.get(target)+tarCount);
+				afterSplit.put(target, map.get(target)-beforeSplit.get(target));
+				System.out.println("Total Count: "+map.toString());
+				System.out.println("Before split at : " +a.get(i)+" "+beforeSplit.toString());
+				System.out.println("After split at : " +a.get(i)+" "+afterSplit.toString()+"\n");
+
+				int r = 0;
+				for (int f : beforeSplit.values()) {
+					r += f;
+				}
+				int g = 0;
+				for (int h : afterSplit.values()) {
+					g += h;
+				}
+				System.out.println("Number of all instances before split :"+ r);
+				System.out.println("Number of all instances after split :"+ g);
+			}
+			x++;
 		}
 
 
-		// y/numAllInstanceB4split * log base 2 (y/
 
+		/*TESTING COUNTING OF ELEMENTS*/
+		//		for (Map.Entry<String, Integer> entry : map.entrySet())
+		//		{
+		//			x += entry.getValue();
+		//		}
 
+		//		System.out.println(x+"vs."+y);
 		return 0;
 	}
 
 
 
-	public double calculateIG(){
+	public double calculateInformationGains(Node node){
+		//
+		//		HashMap<String,Double> ig = new HashMap<String,Double>();
+		//		List<HashMap<String,Double>> igs = node.getIGValues();
+		//		igs.add(ig);
 		return 0;
 	}
 
