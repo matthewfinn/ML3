@@ -148,9 +148,10 @@ public class C45 {
 		//iterate for each numerical attribute
 
 		Map<String, Integer> map = node.getTargetCount();
+		System.out.println("Number of Training Instances: "+node.getData().size());
 
-		int count = node.getattSV().size();
-		int y = node.getData().size();
+
+		//int y = node.getData().size();
 
 		List<List<Double>> splitValues = node.getattSV();
 		List<List<String>> attST = node.getattST(); //List that holds lists of instance type values for each split in each ordering of training instances
@@ -159,6 +160,7 @@ public class C45 {
 		for(List<Double> a: splitValues){
 
 			System.out.println("CALCULATING ENTROPY OF SPLITS "+ attributes[x]+"\n\n");
+
 
 			List<String> targets = attST.get(x);
 			List<Integer> targetCount = attSC.get(x);
@@ -191,6 +193,7 @@ public class C45 {
 				}
 				System.out.println("Number of all instances before split :"+ r);
 				System.out.println("Number of all instances after split :"+ g);
+
 			}
 			x++;
 		}
