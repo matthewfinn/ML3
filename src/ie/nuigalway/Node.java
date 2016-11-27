@@ -18,7 +18,7 @@ public class Node {
 	List<List<Double>> attSV; //List that holds lists of 'split' values for each sorting order of the training instances
 	List<List<String>> attST; //List that holds lists of instance type values for each split in each ordering of training instances
 	List<List<Integer>> attSC; //List that holds lists of instance type counts before each split for each split in each ordering of training instances
-	List<HashMap<String,Double>> IGValues; //Iterate over list to find max value and associated key
+	HashMap<String,Double> IGValues; //Iterate over list to find max value and associated key
 
 	public Node(List<Instance> list){
 		this.data = list;
@@ -27,7 +27,7 @@ public class Node {
 		attSV = new ArrayList<List<Double>>();
 		attST = new ArrayList<List<String>>();
 		attSC = new ArrayList<List<Integer>>();
-		IGValues = new ArrayList<HashMap<String,Double>>();
+		IGValues = new HashMap<String,Double>();
 
 	}
 
@@ -71,7 +71,7 @@ public class Node {
 	}
 
 
-	public List<HashMap<String, Double>> getIGValues() {
+	public HashMap<String, Double> getIGValues() {
 		return IGValues;
 	}
 
@@ -116,7 +116,7 @@ public class Node {
 	}
 
 
-	public void setIGValues(List<HashMap<String, Double>> IGValues) {
+	public void setIGValues(HashMap<String, Double> IGValues) {
 		this.IGValues = IGValues;
 	}
 }

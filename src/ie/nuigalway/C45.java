@@ -104,7 +104,7 @@ public class C45 {
 		List<Double> splits = new ArrayList<Double>();
 		List<Integer> splitCount = new ArrayList<Integer>();
 		List<String> splitType = new ArrayList<String>();
-		int tar = node.getData().get(0).getAttributes().length-1;
+		//int tar = node.getData().get(0).getAttributes().length-1;
 		int count = 0;
 
 		for(int y = 0; y < node.getData().size()-1; y++){
@@ -172,7 +172,7 @@ public class C45 {
 
 			}
 
-			for(int i = 0 ; i < a.size(); i ++){
+			for(int i = 0 ; i < a.size(); i ++){ //for each split value in array of split values
 
 
 				String target = targets.get(i);
@@ -181,7 +181,7 @@ public class C45 {
 				afterSplit.put(target, map.get(target)-beforeSplit.get(target));
 				System.out.println("Total Count: "+map.toString());
 				System.out.println("Before split at : " +a.get(i)+" "+beforeSplit.toString());
-				System.out.println("After split at : " +a.get(i)+" "+afterSplit.toString()+"\n");
+				System.out.println("After split at : " +a.get(i)+" "+afterSplit.toString());
 
 				int r = 0;
 				for (int f : beforeSplit.values()) {
@@ -191,32 +191,83 @@ public class C45 {
 				for (int h : afterSplit.values()) {
 					g += h;
 				}
-				System.out.println("Number of all instances before split :"+ r);
-				System.out.println("Number of all instances after split :"+ g);
+
+				double entb4 = 0;
+				double m = 0;
+				for (int j : beforeSplit.values()) {
+					if(j!=0){
+
+						double p = j;
+						double t = r;
+						entb4 += (-p/t * (Math.log(p/t)/Math.log(2)));
+						m+=j; //count of all values before split
+					}
+				}
+
+				double entAf =0;
+				double n = 0; //count of total values after split
+				for (int j : afterSplit.values()) {
+					if(j!=0){
+
+						double q = j;
+						double w = g;
+
+						entAf += (-q/w * (Math.log(q/w)/Math.log(2)));
+						n+=j;
+					}
+				}
+
+
+				//	System.out.println("Number of all instances before split :"+ r);
+				//System.out.println("Number of all instances after split :"+ g);
+				System.out.println("Before Split Entropy :"+ entb4);
+				System.out.println("After Split Entropy :"+ entAf);
+				calculateInformationGains(node, attributes[x], entb4, entAf, m, n);
 
 			}
 			x++;
 		}
 
-
-
-		/*TESTING COUNTING OF ELEMENTS*/
-		//		for (Map.Entry<String, Integer> entry : map.entrySet())
-		//		{
-		//			x += entry.getValue();
-		//		}
-
-		//		System.out.println(x+"vs."+y);
 		return 0;
 	}
 
 
 
-	public double calculateInformationGains(Node node){
-		//
-		//		HashMap<String,Double> ig = new HashMap<String,Double>();
-		//		List<HashMap<String,Double>> igs = node.getIGValues();
-		//		igs.add(ig);
+	public double calculateInformationGains(Node node, String target, Double entBe, Double entAf, Double countb4, Double countaf){
+
+		Map<String, Integer> totalCount = node.getTargetCount();
+		HashMap<String, Double> infoGains;
+		if(node.getIGValues()!=null){
+			infoGains = node.getIGValues();
+		}else{
+			infoGains = new HashMap<String,Double>();
+		}
+		int s = node.getData().size(); //size of the training data set
+
+		double ig=0;
+		//gets the entropy of the entire training data set
+		for(int j: totalCount.values()){
+			double tar = j;
+			double size = s;
+
+			ig += (-tar/size * (Math.log(tar/size)/Math.log(2)));
+		}
+		System.out.println("IG for total set: "+ig);
+
+		double infoGain = ig - (entBe*(countb4/s))-(entAf*(countaf/s));
+
+		if(infoGains.get(target)==null){
+			infoGains.put(target, infoGain);
+			System.out.println("Added IG of "+infoGain+" for "+target);
+		}
+		if(infoGains.get(target)<infoGain){
+			infoGains.put(target, infoGain);
+			System.out.println("Added IG of "+infoGain+" for "+target);
+		}
+
+		node.setIGValues(infoGains);
+		System.out.println(node.getIGValues().toString()+"\n\n");
+		//get entropy for total set first (i.e
 		return 0;
 	}
 
