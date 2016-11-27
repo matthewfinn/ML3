@@ -5,24 +5,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 public class C45 {
 
 	String[] attributes;
-	List<Node> nodes;
-	//	List<Instance> train;
-	//	List<Instance> test;
-	//	HashMap<String,Integer> targetCount; //hashmap that holds the number of each instance 'type'
-	//
-	//	List<List<Double>> attSV; //List that holds lists of 'split' values for each sorting order of the training instances
-	//	List<List<String>> attST; //List that holds lists of instance type values for each split in each ordering of training instances
-	//	List<List<Integer>> attSC; //List that holds lists of instance type counts before each split for each split in each ordering of training instances
-	//	List<HashMap<String,Double>> entropyValues;
-	/**
-	 * This algorithm has a few base cases.
+	List<Node> nodes = new ArrayList<Node>();
+	HashMap<String,Integer> attribute;
+	String spl;
+	Double val;
 
-
-
-
+	/* This algorithm has a few base cases.
 		Check for the above base cases.
 		For each attribute a, find the normalized information gain ratio from splitting on a.
 		Let a_best be the attribute with the highest normalized information gain.
@@ -30,28 +22,31 @@ public class C45 {
 		Recur on the sublists obtained by splitting on a_best, and add those nodes as children of node.
 	 */
 
-	public C45(String[] atts, List<Instance> tr, List<Instance> tst){
+	public C45(String[] atts, List<Instance> tr){
 
 		attributes = atts;
+
+		//CREATE A HASHMAP OF ATTRIBUTE INDEXES/VALUES
+		attribute =new HashMap<>();
+		for(int i = 0; i < attributes.length; i++){
+
+			attribute.put(attributes[i],i);
+		}
+
 		if(tr!=null){
 			Node node = new Node(tr);
-
 			runC45(node);
+			val = 0.0;
+			spl = null;
 		}
 	}
 
-	public void checkBaseCases(){
-
-		//		1. All the samples in the list belong to the same class. When this happens, it simply creates a leaf node for the decision tree saying to choose that class.
-		//		2. None of the features provide any information gain. In this case, C4.5 creates a decision node higher up the tree using the expected value of the class.
-		//		3. Instance of previously-unseen class encountered. Again, C4.5 creates a decision node higher up the tree using the expected value.
-	}
-
-
 	public void runC45(Node node){
 
-
 		//gets the data splits for each attribute and count
+
+		checkBaseCases(node);
+
 		int x = node.getData().get(0).getAttributes().length - 1;
 
 		for (int i = 0; i < x; i++){
@@ -63,19 +58,43 @@ public class C45 {
 			thresholdSplit(node, i);
 			calculateEntropys(node);
 
+
+
 			//			for(Instance a: node.getData()){
 			//				System.out.println(a.toString());
 			//			}
 			//			System.out.println("Instance types calculated: "+ node.getattST().get(i).toString());
 			//			System.out.println("Instance type count calculated: "+ node.getattSC().get(i).toString());
-			//			System.out.println("Midpoints calculated: "+ node.getattSV().get(i).toString());
+			//System.out.println("Midpoints calculated: "+ node.getattSV().get(i).toString());
 			//			System.out.println(node.getTargetCount());
 		}
 	}
 
-	public HashMap<String,Integer> countInstances(Node node){
-		//Counts the instance of each target value in the dataset
+	public void checkBaseCases(Node node){
 
+
+		//		1. All the samples in the list belong to the same class. When this happens,
+		//      it simply creates a leaf node for the decision tree saying to choose that class.
+
+		for (Instance inst : node.getData()){
+
+		}
+
+
+		//		2. None of the features provide any information gain.
+		//      In this case, C4.5 creates a decision node higher up the tree using the expected value of the class.
+
+		//		3. Instance of previously-unseen class encountered.
+		//      Again, C4.5 creates a decision node higher up the tree using the expected value.
+
+
+
+
+	}
+
+	public HashMap<String,Integer> countInstances(Node node){
+
+		//Counts the instance of each target value in the dataset
 		HashMap<String,Integer> targetCount = new HashMap<String, Integer>();
 
 		String [] counter = new String[node.getData().size()];
@@ -104,7 +123,6 @@ public class C45 {
 		List<Double> splits = new ArrayList<Double>();
 		List<Integer> splitCount = new ArrayList<Integer>();
 		List<String> splitType = new ArrayList<String>();
-		//int tar = node.getData().get(0).getAttributes().length-1;
 		int count = 0;
 
 		for(int y = 0; y < node.getData().size()-1; y++){
@@ -136,10 +154,9 @@ public class C45 {
 		node.setattST(ast);
 
 		return null;
-
 	}
 
-	public double calculateEntropys(Node node){
+	public void calculateEntropys(Node node){
 
 		//get list of lists of split values
 		//get list of lists of split types
@@ -160,20 +177,19 @@ public class C45 {
 		for(List<Double> a: splitValues){
 
 			System.out.println("CALCULATING ENTROPY OF SPLITS "+ attributes[x]+"\n\n");
+			System.out.println(a.toString());
 
 
 			List<String> targets = attST.get(x);
 			List<Integer> targetCount = attSC.get(x);
-			Map<String,Integer> beforeSplit = new HashMap();
-			Map<String,Integer> afterSplit = new HashMap();
+			Map<String,Integer> beforeSplit = new HashMap<String, Integer>();
+			Map<String,Integer> afterSplit = new HashMap<String, Integer>();
 			for(String tar: map.keySet()){ //puts each target value in the hashmap
 				beforeSplit.put(tar, 0);
 				afterSplit.put(tar, map.get(tar));
-
 			}
 
 			for(int i = 0 ; i < a.size(); i ++){ //for each split value in array of split values
-
 
 				String target = targets.get(i);
 				int tarCount = targetCount.get(i);
@@ -222,18 +238,19 @@ public class C45 {
 				//System.out.println("Number of all instances after split :"+ g);
 				System.out.println("Before Split Entropy :"+ entb4);
 				System.out.println("After Split Entropy :"+ entAf);
-				calculateInformationGains(node, attributes[x], entb4, entAf, m, n);
+				calculateInformationGains(node, attributes[x], entb4, entAf, m, n, a.get(i));
 
 			}
 			x++;
 		}
 
-		return 0;
+		nodes.add(node);
+		System.out.println("Node Name: "+ node.getName() + ". Node Value: "+node.getValue());
+		splitList(node.getName(), node.getValue(), node);
+
 	}
 
-
-
-	public double calculateInformationGains(Node node, String target, Double entBe, Double entAf, Double countb4, Double countaf){
+	public void calculateInformationGains(Node node, String target, Double entBe, Double entAf, Double countb4, Double countaf, Double splitValue){
 
 		Map<String, Integer> totalCount = node.getTargetCount();
 		HashMap<String, Double> infoGains;
@@ -256,25 +273,48 @@ public class C45 {
 
 		double infoGain = ig - (entBe*(countb4/s))-(entAf*(countaf/s));
 
+
 		if(infoGains.get(target)==null){
 			infoGains.put(target, infoGain);
-			System.out.println("Added IG of "+infoGain+" for "+target);
+			System.out.println("Added IG of "+infoGain+" for "+target+" at value "+splitValue);
+			spl = target;
+			val = splitValue;
 		}
 		if(infoGains.get(target)<infoGain){
 			infoGains.put(target, infoGain);
-			System.out.println("Added IG of "+infoGain+" for "+target);
+			System.out.println("Added IG of "+infoGain+" for "+target+" at value "+splitValue);
+			spl = target;
+			val = splitValue;
 		}
-
 		node.setIGValues(infoGains);
 		System.out.println(node.getIGValues().toString()+"\n\n");
-		//get entropy for total set first (i.e
-		return 0;
+
+		node.setName(spl);
+		node.setValue(val);
+		node.setHasChildren(true);
 	}
+
+	public void splitList(String name, Double v, Node nd){
+
+		//		int x = attribute.get(name);
+		//		Instance.setSortAttribute(x);
+		//		Collections.sort(nd.getData());
+		//
+		//		List<Instance> l1 = new ArrayList<Instance>();
+		//		List<Instance> l2 = new ArrayList<Instance>();
+		//
+		//		for (Instance in : nd.getData()){
+		//			if((Double)in.getAttributes()[x] <= v){
+		//				l1.add(in);
+		//			}else{
+		//				l2.add(in);
+		//			}
+		//		}
+
+	}
+
 
 	public void train(){
 
 	}
-
-
-	public void test(){}
 }

@@ -140,7 +140,7 @@ public class Driver extends JFrame implements ActionListener {
 					}
 					dpr.getData(file.toString(), percent);
 
-					C45 alg = new C45(dpr.attributeNames,dpr.getTrainingInstances(),dpr.getTestInstances());
+					C45 alg = new C45(dpr.attributeNames,dpr.getTrainingInstances());
 					//	alg.runC45();
 
 				} catch (Exception e1) {

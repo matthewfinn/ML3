@@ -90,7 +90,7 @@ public class DataPreparationTool {
 		for (String[] inst: testData){
 			Object instance[] = new Object[x];
 			for(int i = 0; i<x;i++){
-				//parses input to double if possible, else it's a string
+				//parses input to double if possible, else it's assumed to be a string
 				if(isNumber(inst[i])){
 					instance[i] = Double.parseDouble(inst[i]);
 				}else{

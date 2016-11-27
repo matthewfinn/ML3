@@ -6,12 +6,13 @@ import java.util.List;
 
 public class Node {
 
-	private String value;
+	private Double value;
+	private String name;
 	private HashMap<String, Node> children;
 	private Node parent;
 	private boolean hasChildren;
-
-
+	private boolean isLeaf;
+	private int[] chOff;
 	private List<Instance> data; //instances used in this node
 	HashMap<String,Integer> targetCount;
 
@@ -30,11 +31,13 @@ public class Node {
 		IGValues = new HashMap<String,Double>();
 
 	}
-
-	public String getVype() {
-		return value;
+	public String getName() {
+		return name;
 	}
 
+	public Double getValue() {
+		return value;
+	}
 
 	public HashMap<String, Node> getChildren() {
 		return children;
@@ -75,8 +78,10 @@ public class Node {
 		return IGValues;
 	}
 
-
-	public void setValue(String value) {
+	public void setName(String name) {
+		this.name = name;
+	}
+	public void setValue(Double value) {
 		this.value = value;
 	}
 
@@ -118,6 +123,25 @@ public class Node {
 
 	public void setIGValues(HashMap<String, Double> IGValues) {
 		this.IGValues = IGValues;
+	}
+
+	public boolean hasChildren() {
+		return hasChildren;
+	}
+	public boolean isLeaf() {
+		return isLeaf;
+	}
+	public int[] getChOff() {
+		return chOff;
+	}
+	public void setHasChildren(boolean hasChildren) {
+		this.hasChildren = hasChildren;
+	}
+	public void setLeaf(boolean isLeaf) {
+		this.isLeaf = isLeaf;
+	}
+	public void setChOff(int[] chOff) {
+		this.chOff = chOff;
 	}
 }
 
