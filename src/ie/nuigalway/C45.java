@@ -243,7 +243,9 @@ public class C45 {
 			}
 			x++;
 		}
-
+		node.setName(spl);
+		node.setValue(val);
+		node.setHasChildren(true);
 		nodes.add(node);
 		System.out.println("Node Name: "+ node.getName() + ". Node Value: "+node.getValue());
 		splitList(node.getName(), node.getValue(), node);
@@ -286,30 +288,31 @@ public class C45 {
 			spl = target;
 			val = splitValue;
 		}
-		node.setIGValues(infoGains);
-		System.out.println(node.getIGValues().toString()+"\n\n");
+		node.setIGValues(infoGains); //not needed
+		System.out.println(node.getIGValues().toString()+"\n\n"); //not needed
 
-		node.setName(spl);
-		node.setValue(val);
-		node.setHasChildren(true);
+
 	}
 
 	public void splitList(String name, Double v, Node nd){
 
-		//		int x = attribute.get(name);
-		//		Instance.setSortAttribute(x);
-		//		Collections.sort(nd.getData());
-		//
-		//		List<Instance> l1 = new ArrayList<Instance>();
-		//		List<Instance> l2 = new ArrayList<Instance>();
-		//
-		//		for (Instance in : nd.getData()){
-		//			if((Double)in.getAttributes()[x] <= v){
-		//				l1.add(in);
-		//			}else{
-		//				l2.add(in);
-		//			}
-		//		}
+		int x = attribute.get(name);
+		Instance.setSortAttribute(x);
+		Collections.sort(nd.getData());
+
+		List<Instance> l1 = new ArrayList<Instance>();
+		List<Instance> l2 = new ArrayList<Instance>();
+
+		for (Instance in : nd.getData()){
+			if((Double)in.getAttributes()[x] <= v){
+				l1.add(in);
+			}else{
+				l2.add(in);
+			}
+		}
+
+		new C45(attributes, l1);
+		new C45(attributes, l2);
 
 	}
 
