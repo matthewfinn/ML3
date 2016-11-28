@@ -8,7 +8,7 @@ public class Node {
 
 	private Double value;
 	private String name;
-	private HashMap<String, Node> children;
+	private List<Node> children;
 	private Node parent;
 	private boolean hasChildren;
 	private boolean isLeaf;
@@ -29,6 +29,7 @@ public class Node {
 		attST = new ArrayList<List<String>>();
 		attSC = new ArrayList<List<Integer>>();
 		IGValues = new HashMap<String,Double>();
+		children = new ArrayList<Node>();
 
 	}
 	public String getName() {
@@ -39,7 +40,7 @@ public class Node {
 		return value;
 	}
 
-	public HashMap<String, Node> getChildren() {
+	public List<Node> getChildren() {
 		return children;
 	}
 
@@ -86,8 +87,8 @@ public class Node {
 	}
 
 
-	public void setChildren(HashMap<String, Node> children) {
-		this.children = children;
+	public void addChild(Node n) {
+		children.add(n);
 	}
 
 

@@ -34,62 +34,83 @@ public class C45 {
 		}
 
 		if(tr!=null){
+
 			Node node = new Node(tr);
 			runC45(node);
-			val = 0.0;
-			spl = null;
 		}
 	}
 
 	public void runC45(Node node){
 
-		//gets the data splits for each attribute and count
+		val = 0.0;
+		spl = null;
 
-		checkBaseCases(node);
-
-		int x = node.getData().get(0).getAttributes().length - 1;
-
-		for (int i = 0; i < x; i++){
-			//			System.out.println("Sorted by: "+attributes[i]);
-			Instance.setSortAttribute(i);
-			Collections.sort(node.getData());
-
-			countInstances(node);
-			thresholdSplit(node, i);
-			calculateEntropys(node);
-
-
-
-			//			for(Instance a: node.getData()){
-			//				System.out.println(a.toString());
-			//			}
-			//			System.out.println("Instance types calculated: "+ node.getattST().get(i).toString());
-			//			System.out.println("Instance type count calculated: "+ node.getattSC().get(i).toString());
-			//System.out.println("Midpoints calculated: "+ node.getattSV().get(i).toString());
-			//			System.out.println(node.getTargetCount());
+		if(checkBaseCases(node)){
+			nodes.add(node);
 		}
+		else if(!checkBaseCases(node)) {
+			int x = node.getData().get(0).getAttributes().length - 1;
+			for (int i = 0; i < x; i++){
+				//			System.out.println("Sorted by: "+attributes[i]);
+
+				Instance.setSortAttribute(i);
+				Collections.sort(node.getData());
+
+				countInstances(node);
+				thresholdSplit(node, i);
+				calculateEntropys(node);
+			}
+		}
+
+		//System.out.println(nodes.toString());
 	}
 
-	public void checkBaseCases(Node node){
+	public boolean checkBaseCases(Node node){
 
 
 		//		1. All the samples in the list belong to the same class. When this happens,
 		//      it simply creates a leaf node for the decision tree saying to choose that class.
+		HashMap<String,Integer> count = countInstances(node);
 
 		for (Instance inst : node.getData()){
 
+			for (String key : count.keySet()) {
+				if(count.get(key)==node.getData().size()){
+					node.setName(key);
+					node.setValue(null);
+					node.setHasChildren(false);
+					System.out.println("Node created with value "+key);
+					return true;
+				}
+			}
 		}
-
-
 		//		2. None of the features provide any information gain.
 		//      In this case, C4.5 creates a decision node higher up the tree using the expected value of the class.
 
+		if(node.getData().isEmpty()){
+			System.out.println("No data in array");
+			node.setName("Failure To Classify");
+			node.setValue(null);
+			node.setHasChildren(false);
+			return true;
+		}
+
 		//		3. Instance of previously-unseen class encountered.
 		//      Again, C4.5 creates a decision node higher up the tree using the expected value.
+		for(Instance inst:node.getData()){
 
+			if(count.get(inst.getType()) == null){
 
+				System.out.println(count.get(inst.getType()));
+				System.out.println(inst.getType());
+				System.out.println(count.toString());
 
-
+				node.setValue(null);
+				node.setHasChildren(false);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public HashMap<String,Integer> countInstances(Node node){
@@ -114,7 +135,6 @@ public class C45 {
 
 		node.setTargetCount(targetCount);
 		return targetCount;
-
 	}
 
 
@@ -238,8 +258,8 @@ public class C45 {
 				//System.out.println("Number of all instances after split :"+ g);
 				System.out.println("Before Split Entropy :"+ entb4);
 				System.out.println("After Split Entropy :"+ entAf);
-				calculateInformationGains(node, attributes[x], entb4, entAf, m, n, a.get(i));
 
+				calculateInformationGains(node, attributes[x], entb4, entAf, m, n, a.get(i));
 			}
 			x++;
 		}
@@ -311,8 +331,14 @@ public class C45 {
 			}
 		}
 
-		new C45(attributes, l1);
-		new C45(attributes, l2);
+		Node n1 = new Node(l1);
+		Node n2 = new Node(l2);
+		nd.addChild(n1);
+		nd.addChild(n2);
+		runC45(n1);
+		runC45(n2);
+
+
 
 	}
 
