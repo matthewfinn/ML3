@@ -144,5 +144,11 @@ public class Node {
 	public void setChOff(int[] chOff) {
 		this.chOff = chOff;
 	}
+
+	@Override
+	public String toString(){
+
+		return this.name + this.value;
+	}
 }
 

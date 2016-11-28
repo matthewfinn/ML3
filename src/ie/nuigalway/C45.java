@@ -38,6 +38,10 @@ public class C45 {
 			Node node = new Node(tr);
 			runC45(node);
 		}
+
+
+		System.out.println(nodes.size());
+
 	}
 
 	public void runC45(Node node){
@@ -62,14 +66,12 @@ public class C45 {
 			}
 		}
 
-		//System.out.println(nodes.toString());
 	}
 
 	public boolean checkBaseCases(Node node){
 
 
-		//		1. All the samples in the list belong to the same class. When this happens,
-		//      it simply creates a leaf node for the decision tree saying to choose that class.
+		//All instances belong to the same class
 		HashMap<String,Integer> count = countInstances(node);
 
 		for (Instance inst : node.getData()){
@@ -84,9 +86,8 @@ public class C45 {
 				}
 			}
 		}
-		//		2. None of the features provide any information gain.
-		//      In this case, C4.5 creates a decision node higher up the tree using the expected value of the class.
 
+		//empty training set
 		if(node.getData().isEmpty()){
 			System.out.println("No data in array");
 			node.setName("Failure To Classify");
@@ -95,21 +96,27 @@ public class C45 {
 			return true;
 		}
 
-		//		3. Instance of previously-unseen class encountered.
-		//      Again, C4.5 creates a decision node higher up the tree using the expected value.
+
+		//new class type encountered.
 		for(Instance inst:node.getData()){
 
 			if(count.get(inst.getType()) == null){
-
-				System.out.println(count.get(inst.getType()));
-				System.out.println(inst.getType());
-				System.out.println(count.toString());
 
 				node.setValue(null);
 				node.setHasChildren(false);
 				return true;
 			}
 		}
+
+		if(node.getData().size()==1){
+
+			node.setName(node.getData().get(0).getType());
+			node.setValue(null);
+			node.setHasChildren(false);
+			return true;
+
+		}
+
 		return false;
 	}
 
@@ -186,6 +193,8 @@ public class C45 {
 
 		Map<String, Integer> map = node.getTargetCount();
 		System.out.println("Number of Training Instances: "+node.getData().size());
+		int b4 = 0;
+		int af = 0;
 
 
 		//int y = node.getData().size();
@@ -196,7 +205,7 @@ public class C45 {
 		int x = 0;
 		for(List<Double> a: splitValues){
 
-			System.out.println("CALCULATING ENTROPY OF SPLITS "+ attributes[x]+"\n\n");
+			System.out.println("\n\nCALCULATING ENTROPY OF SPLITS "+ attributes[x]);
 			System.out.println(a.toString());
 
 
@@ -252,14 +261,22 @@ public class C45 {
 						n+=j;
 					}
 				}
-
-
-				//	System.out.println("Number of all instances before split :"+ r);
+				b4 = (int)m;
+				//System.out.println("Number of all instances before split :"+ r);
 				//System.out.println("Number of all instances after split :"+ g);
 				System.out.println("Before Split Entropy :"+ entb4);
 				System.out.println("After Split Entropy :"+ entAf);
+				if(entb4==0.0 || entAf==0.0){
+					node.setName(attributes[x]);
+					node.setValue(a.get(i));
+					node.setHasChildren(true);
+					nodes.add(node);
+					splitList(node.getName(),node.getValue(),node, b4);
 
-				calculateInformationGains(node, attributes[x], entb4, entAf, m, n, a.get(i));
+				}else{
+
+					calculateInformationGains(node, attributes[x], entb4, entAf, m, n, a.get(i));
+				}
 			}
 			x++;
 		}
@@ -268,7 +285,7 @@ public class C45 {
 		node.setHasChildren(true);
 		nodes.add(node);
 		System.out.println("Node Name: "+ node.getName() + ". Node Value: "+node.getValue());
-		splitList(node.getName(), node.getValue(), node);
+		splitList(node.getName(), node.getValue(), node, b4);
 
 	}
 
@@ -314,7 +331,7 @@ public class C45 {
 
 	}
 
-	public void splitList(String name, Double v, Node nd){
+	public void splitList(String name, Double v, Node nd, int a){
 
 		int x = attribute.get(name);
 		Instance.setSortAttribute(x);
@@ -323,27 +340,29 @@ public class C45 {
 		List<Instance> l1 = new ArrayList<Instance>();
 		List<Instance> l2 = new ArrayList<Instance>();
 
+		System.out.println(a);
+		//System.out.println(b);
+		int i = 0;
 		for (Instance in : nd.getData()){
-			if((Double)in.getAttributes()[x] <= v){
+
+			if(i<a){
 				l1.add(in);
-			}else{
+			}
+			if(i>=a){
 				l2.add(in);
 			}
+
+			i++;
 		}
+		System.out.println(l1.toString());
+		System.out.println(l2.toString());
 
 		Node n1 = new Node(l1);
-		Node n2 = new Node(l2);
 		nd.addChild(n1);
-		nd.addChild(n2);
 		runC45(n1);
+
+		Node n2 = new Node(l2);
+		nd.addChild(n2);
 		runC45(n2);
-
-
-
-	}
-
-
-	public void train(){
-
 	}
 }
