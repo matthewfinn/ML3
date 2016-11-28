@@ -15,6 +15,7 @@ public class Node {
 	List<List<String>> attST; //List that holds lists of instance type values for each split in each ordering of training instances
 	List<List<Integer>> attSC; //List that holds lists of instance type counts before each split for each split in each ordering of training instances
 	HashMap<String,Double> IGValues; //Iterate over list to find max value and associated key
+
 	public Node(List<Instance> list){
 		this.data = list;
 		targetCount = new HashMap<String,Integer>();

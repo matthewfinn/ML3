@@ -186,9 +186,7 @@ public class C45 {
 		      iterate for each numerical attribute*/
 
 		Map<String, Integer> map = nd.getTargetCount();
-		//	System.out.println("Number of Training Instances: "+node.getData().size());
 		int b4 = 0; //int var to hold before split instance count
-		//	int af = 0; //int var to hold after split instance count
 
 		List<List<Double>> splitValues = nd.getattSV();
 		List<List<String>> attST = nd.getattST();
@@ -200,7 +198,6 @@ public class C45 {
 			List<Integer> targetCount = attSC.get(x); //gets list of counts before each split
 			Map<String,Integer> beforeSplit = new HashMap<String, Integer>();
 			Map<String,Integer> afterSplit = new HashMap<String, Integer>();
-
 
 			for(String tar: map.keySet()){ //puts each target value in the hashmap
 				beforeSplit.put(tar, 0);
@@ -320,14 +317,12 @@ public class C45 {
 		//if the target attribute doesn't exist add it to hashmap and give it value calculated
 		if(infoGains.get(target)==null){
 			infoGains.put(target, infoGain);
-			//	System.out.println("Added IG of "+infoGain+" for "+target+" at value "+splitValue);
 			spl = target;
 			val = splitValue;
 		}
 		//only adds information gain for the target attribute if it's greater than the current value
 		if(infoGains.get(target)<infoGain){
 			infoGains.put(target, infoGain);
-			//	System.out.println("Added IG of "+infoGain+" for "+target+" at value "+splitValue);
 			spl = target;
 			val = splitValue;
 		}

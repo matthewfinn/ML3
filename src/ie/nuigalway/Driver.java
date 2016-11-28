@@ -79,10 +79,10 @@ public class Driver extends JFrame implements ActionListener {
 
 		lay.setHorizontalGroup(lay.createSequentialGroup()
 				.addGroup(lay.createParallelGroup(GroupLayout.Alignment.LEADING)
-						.addComponent(dataset).addComponent(trainingData).addComponent(output)
+						.addComponent(dataset).addComponent(trainingData)
 						)
 				.addGroup(lay.createParallelGroup(GroupLayout.Alignment.LEADING)
-						.addComponent(filename).addComponent(splitPercentage).addComponent(results)
+						.addComponent(filename).addComponent(splitPercentage)
 						)
 				.addGroup(lay.createParallelGroup(GroupLayout.Alignment.LEADING)
 						.addComponent(chooseFile).addComponent(run)
@@ -94,7 +94,7 @@ public class Driver extends JFrame implements ActionListener {
 				.addGroup(lay.createParallelGroup(GroupLayout.Alignment.LEADING)
 						.addComponent(trainingData).addComponent(splitPercentage).addComponent(run))
 				.addGroup(lay.createParallelGroup(GroupLayout.Alignment.LEADING)
-						.addComponent(output).addComponent(results)));
+						));
 
 		fr.add(jpan);
 		fr.pack();
@@ -133,9 +133,7 @@ public class Driver extends JFrame implements ActionListener {
 						percent = null;
 					}
 					dpr.getData(file.toString(), percent);
-
 					C45 alg = new C45(dpr.attributeNames,dpr.getTrainingInstances());
-
 				} catch (Exception e1) {
 
 					e1.printStackTrace();
