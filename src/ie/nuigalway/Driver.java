@@ -20,9 +20,6 @@ import javax.swing.border.Border;
 
 public class Driver extends JFrame implements ActionListener {
 
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = 3607480549773219415L;
 	//All Components needed to build GUI
 	public static File file;
@@ -68,7 +65,7 @@ public class Driver extends JFrame implements ActionListener {
 		trainingData = new JLabel("Training Data %: ");
 		splitPercentage = new JTextArea();
 		splitPercentage.setEditable(true);
-		//splitPercentage.setText("0");
+		splitPercentage.setText("66");
 		splitPercentage.setBorder(border);
 		run = new JButton("Run");
 		run.addActionListener(this);
@@ -91,7 +88,6 @@ public class Driver extends JFrame implements ActionListener {
 						.addComponent(chooseFile).addComponent(run)
 						)
 				);
-
 		lay.setVerticalGroup(lay.createSequentialGroup()
 				.addGroup(lay.createParallelGroup(GroupLayout.Alignment.LEADING)
 						.addComponent(dataset).addComponent(filename).addComponent(chooseFile))
@@ -128,9 +124,7 @@ public class Driver extends JFrame implements ActionListener {
 				filename.append("ERROR! No dataset chosen. \nPlease choose dataset before running algorithm.");
 			}
 			else{
-
 				DataPreparationTool dpr = new DataPreparationTool();
-
 				try {
 					if(!splitPercentage.getText().equals("")){
 						percent = splitPercentage.getText();
@@ -141,27 +135,14 @@ public class Driver extends JFrame implements ActionListener {
 					dpr.getData(file.toString(), percent);
 
 					C45 alg = new C45(dpr.attributeNames,dpr.getTrainingInstances());
-					//	alg.runC45();
 
 				} catch (Exception e1) {
 
 					e1.printStackTrace();
 				}
 
-				//trainingInstances = dpr.getTrainingInstances();
-				//testInstances = dpr.getTestInstances();
-
-				//Run algorithm 10 times. Print results each time
-				//results.append("Hello World \n");
-				//results.append("Hello World \n");
-
-				//compute average accuracy
 
 			}
-
 		}
 	}
 }
-
-
-

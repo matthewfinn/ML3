@@ -11,29 +11,22 @@ import org.apache.commons.lang3.math.NumberUtils;
 public class DataPreparationTool {
 
 	private static final String DEFAULT_SEPARATOR = ",";
-
-	//List<Attribute> attributes;
 	List<String[]> trainingAttributes;
 	List<String[]> testAttributes;
-
-
 	BufferedReader br;
 	String line;
 	String file;
 	double tra;
-
 	String[] attributeNames;
 	List<String[]> testData;
 	List<String[]> trainingData;
 	List<Instance> trainingInstances;
 	List<Instance> testInstances;
 	public void getData(String f, String training) throws Exception{
-
 		testData = new ArrayList<>();
 		trainingData = new ArrayList<>();
 		file = f;
 		br = new BufferedReader(new FileReader(file));
-
 		attributeNames = br.readLine().split(DEFAULT_SEPARATOR);
 
 		while ((line = br.readLine()) != null) { //splits on each line, csv is line separated
@@ -43,15 +36,12 @@ public class DataPreparationTool {
 			//adds the objectholder
 			testData.add(objectHolder);
 		}
-
 		if (training!=null){
-
 			tra = Double.parseDouble(training); //checks if input for training data % is null
 			if(tra!=0){
 				getTrainingData(tra);//calls a data split if entry is not = 0
 			}
 		}
-
 	}
 	public List<String[]> getTrainingData(double tr){
 
@@ -64,10 +54,8 @@ public class DataPreparationTool {
 	}
 
 	public List<Instance> getTrainingInstances(){
-
 		trainingInstances = new ArrayList<>();
 		int x = trainingData.get(0).length;
-
 		for(String[] inst : trainingData){
 			Object instance[] = new Object[x];
 			for(int i = 0; i<x;i++){

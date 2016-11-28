@@ -17,7 +17,6 @@ public class C45 {
 	public C45(String[] atts, List<Instance> tr){
 
 		attributeNames = atts; //attribute names for each instances
-
 		//create a hashmap for attribute index values so each
 		//instance attribute can be accessd through attribute name
 		attributeIndexes =new HashMap<>();
@@ -25,7 +24,6 @@ public class C45 {
 
 			attributeIndexes.put(attributeNames[i],i);
 		}
-
 		//if the dataset for the root node is not null create the root node and run C4.5
 		if(tr!=null){
 
@@ -36,27 +34,28 @@ public class C45 {
 
 	public void runC45(Node node){
 
+		Node nd = node;
 		val = 0.0; //setting the initial value of the variable used to set the value of the node created
 		spl = null; //setting the initial value of the variable used to set the name of the node created
 
 		//if checkBaseCases returns true the node can be added to the list of nodes for the algorithm
-		if(checkBaseCases(node)){
-			nodes.add(node);
+		if(checkBaseCases(nd)){
+			nodes.add(nd);
 		}
 		//if checkBaseCases returns false then the entropy and information gain for each attribute in the node is calculates
-		else if(!checkBaseCases(node)) {
+		else if(!checkBaseCases(nd)) {
 			//gets the number of attribute (Less the target) for each instance
-			int x = node.getData().get(0).getAttributes().length - 1;
+			int x = nd.getData().get(0).getAttributes().length - 1;
 
 			//loops over each attribute in the training set instances
 			for (int i = 0; i < x; i++){
 
 				Instance.setSortAttribute(i);
-				Collections.sort(node.getData());
+				Collections.sort(nd.getData());
 
-				countInstances(node);
-				thresholdSplit(node, i);
-				calculateEntropys(node);
+				countInstances(nd);
+				thresholdSplit(nd, i);
+				calculateEntropys(nd);
 			}
 		}
 
@@ -64,14 +63,15 @@ public class C45 {
 
 	public boolean checkBaseCases(Node node){
 
+		Node nd = node;
 		//All instances belong to the same class
-		HashMap<String,Integer> targetCount = countInstances(node);
+		HashMap<String,Integer> targetCount = countInstances(nd);
 		for (Instance inst : node.getData()){
 			for (String key : targetCount.keySet()) {
-				if(targetCount.get(key)==node.getData().size()){
-					node.setName(key);
-					node.setValue(null);
-					node.setHasChildren(false);
+				if(targetCount.get(key)==nd.getData().size()){
+					nd.setName(key);
+					nd.setValue(null);
+					nd.setHasChildren(false);
 					System.out.println("Node created with value "+key);
 					return true;
 				}
@@ -79,34 +79,22 @@ public class C45 {
 		}
 
 		//if training set is empty
-		if(node.getData().isEmpty()){
+		if(nd.getData().isEmpty()){
 			System.out.println("No data in array");
-			node.setName("Failure To Classify");
-			node.setValue(null);
-			node.setHasChildren(false);
+			nd.setName("Failure To Classify");
+			nd.setValue(null);
+			nd.setHasChildren(false);
 			return true;
 		}
 
 		//new class type encountered.
-		for(Instance inst:node.getData()){
+		for(Instance inst:nd.getData()){
 			if(targetCount.get(inst.getType()) == null){
-				node.setValue(null);
-				node.setHasChildren(false);
+				nd.setValue(null);
+				nd.setHasChildren(false);
 				return true;
 			}
 		}
-
-		//Shouldn't be needed
-		//
-		//		if(node.getData().size()==1){
-		//
-		//			node.setName(node.getData().get(0).getType());
-		//			node.setValue(null);
-		//			node.setHasChildren(false);
-		//			return true;
-		//
-		//		}
-
 		return false;
 	}
 
@@ -116,13 +104,14 @@ public class C45 {
 	 * @return hashmap of instances types and their value(count) in node
 	 */
 	public HashMap<String,Integer> countInstances(Node node){
+		Node nd = node;
 
 		//Counts the instance of each target value in the dataset
 		HashMap<String,Integer> targetCount = new HashMap<String, Integer>();
 
-		String [] instanceCount = new String[node.getData().size()];
+		String [] instanceCount = new String[nd.getData().size()];
 		int c = 0;
-		for(Instance in: node.getData()){
+		for(Instance in: nd.getData()){
 
 			instanceCount[c]= in.getType();
 			c++;
@@ -134,7 +123,7 @@ public class C45 {
 				targetCount.put(s,new Integer(1));
 			}
 		}
-		node.setTargetCount(targetCount);
+		nd.setTargetCount(targetCount);
 		return targetCount;
 	}
 
@@ -146,22 +135,25 @@ public class C45 {
 	 */
 	public void thresholdSplit(Node node, int i){
 
+		Node nd = node;
+		int u = i;
+
 		List<Double> splits = new ArrayList<Double>(); //arraylist to hold attribute midpoint split values
 		List<Integer> splitCount = new ArrayList<Integer>();//arraylist to hold number of instances before each split
 		List<String> splitType = new ArrayList<String>();//arraylist to hold type of instance value split on
 		int count = 0; //counter
 
-		for(int y = 0; y < node.getData().size()-1; y++){
+		for(int y = 0; y < nd.getData().size()-1; y++){
 
-			String current = node.getData().get(y).getType(); //current instance type
-			String next =  node.getData().get(y+1).getType(); //instance after current type
+			String current = nd.getData().get(y).getType(); //current instance type
+			String next =  nd.getData().get(y+1).getType(); //instance after current type
 
 			count++; //increment counter
 			if(!current.equals(next)){ //if current instance type is not equal to next instance type
 
 				//get value at y and y+1, add them and divide by 2 to get midpoint between
-				Double split = ((Double) (node.getData().get(y).getAttributes()[i]) +
-						(Double)(node.getData().get(y+1).getAttributes()[i]))/2;
+				Double split = ((Double) (nd.getData().get(y).getAttributes()[u]) +
+						(Double)(nd.getData().get(y+1).getAttributes()[u]))/2;
 				splits.add(split); //adds the value of the split
 				splitCount.add(count); //adds the number of instances between each split
 				splitType.add(current); //adds the instance type of the instance before the split
@@ -169,20 +161,22 @@ public class C45 {
 			}
 
 		}
-		List<List<Double>> asv = node.getattSV();
+		List<List<Double>> asv = nd.getattSV();
 		asv.add(splits);
-		node.setattSV(asv); //assigns split value List to node
+		nd.setattSV(asv); //assigns split value List to node
 
-		List<List<Integer>> asc = node.getattSC();
+		List<List<Integer>> asc = nd.getattSC();
 		asc.add(splitCount);
-		node.setattSC(asc); //assigns split count list to node
+		nd.setattSC(asc); //assigns split count list to node
 
-		List<List<String>> ast = node.getattST();
+		List<List<String>> ast = nd.getattST();
 		ast.add(splitType);
-		node.setattST(ast); //assigns split instance type to node
+		nd.setattST(ast); //assigns split instance type to node
 	}
 
 	public void calculateEntropys(Node node){
+
+		Node nd = node;
 
 		/*
 		 * 1. Get list of lists of split values
@@ -191,20 +185,16 @@ public class C45 {
 		   4. Generate List of counts after split for each target
 		      iterate for each numerical attribute*/
 
-		Map<String, Integer> map = node.getTargetCount();
+		Map<String, Integer> map = nd.getTargetCount();
 		//	System.out.println("Number of Training Instances: "+node.getData().size());
 		int b4 = 0; //int var to hold before split instance count
 		//	int af = 0; //int var to hold after split instance count
 
-		List<List<Double>> splitValues = node.getattSV();
-		List<List<String>> attST = node.getattST();
-		List<List<Integer>> attSC = node.getattSC();
+		List<List<Double>> splitValues = nd.getattSV();
+		List<List<String>> attST = nd.getattST();
+		List<List<Integer>> attSC = nd.getattSC();
 		int x = 0; //counter
 		for(List<Double> a: splitValues){ //iterate over lists of split values
-
-			System.out.println("\n\nCalculating Entropy of splits for  "+ attributeNames[x]);
-			System.out.println("Split Values for "+attributeNames[x]+" : "+a.toString());
-
 
 			List<String> targets = attST.get(x); //gets list of split targets
 			List<Integer> targetCount = attSC.get(x); //gets list of counts before each split
@@ -223,10 +213,6 @@ public class C45 {
 				int tarCount = targetCount.get(i);
 				beforeSplit.put(target, beforeSplit.get(target)+tarCount);
 				afterSplit.put(target, map.get(target)-beforeSplit.get(target));
-
-				System.out.println("Total Count: "+map.toString());
-				System.out.println("Before split at : " +a.get(i)+" "+beforeSplit.toString());
-				System.out.println("After split at : " +a.get(i)+" "+afterSplit.toString());
 
 				int r = 0;
 				for (int f : beforeSplit.values()) { //gets number of all instances before split
@@ -265,94 +251,100 @@ public class C45 {
 						//target value occurances after split /
 						//total num of instances after split *
 						//log base 2 (target value occurances before split/num instances after split)
-
 						entAf += (-q/w * (Math.log(q/w)/Math.log(2)));
 						n+=j;
 					}
 				}
-				b4 = (int)m; //cast before split occurace to an int to send to splitList function
-
-				System.out.println("Before Split Entropy :"+ entb4);
-				System.out.println("After Split Entropy :"+ entAf);
+				b4 = (int) m; //cast before split occurace to an int to send to splitList function
 
 				//if either entropy is 0.0 set the node name and value as the target type before split
-				if(entb4==0.0 || entAf==0.0){
-					node.setName(attributeNames[x]);
-					node.setValue(a.get(i));
-					node.setHasChildren(true);
-					nodes.add(node);
-					splitList(node.getName(),node.getValue(),node, b4);
-
+				if(entb4==0.0 && entAf==0.0){
+					nd.setName(attributeNames[x]);
+					System.out.println("Node created with value "+nd.getName()+"><="+nd.getValue());
+					nd.setValue(a.get(i));
+					nd.setHasChildren(true);
+					nodes.add(nd);
+					splitList(nd.getName(),nd.getValue(),nd, b4);
 				}else{
 
-					calculateInformationGains(node, attributeNames[x], entb4, entAf, m, n, a.get(i));
+					calculateInformationGains(nd, attributeNames[x], entb4, entAf, m, n, a.get(i));
 				}
 			}
 			x++;
 		}
-		node.setName(spl);
-		node.setValue(val);
-		node.setHasChildren(true);
-		nodes.add(node);
-		System.out.println("Node Name: "+ node.getName() + ". Node Value: "+node.getValue());
-		splitList(node.getName(), node.getValue(), node, b4);
+		if(spl!=null || val!=0.0){
+			nd.setName(spl);
+			nd.setValue(val);
+			nd.setHasChildren(true);
+			System.out.println("Node created with value "+nd.getName()+"><="+nd.getValue());
+			nodes.add(nd);
+			splitList(nd.getName(), nd.getValue(), nd, b4);
+		}
 
 	}
-
+	/**
+	 *
+	 * @param node - to get data needed to calculate info gain
+	 * @param target - target to store gains for
+	 * @param entBe - entropy before split
+	 * @param entAf - entropy after split
+	 * @param countb4 - count of instances before split
+	 * @param countaf - count of instance after split
+	 * @param splitValue - value data is split on
+	 */
 	public void calculateInformationGains(Node node, String target,
 			Double entBe, Double entAf, Double countb4, Double countaf, Double splitValue){
 
-		Map<String, Integer> totalCount = node.getTargetCount();
-		HashMap<String, Double> infoGains;
-		if(node.getIGValues()!=null){
-			infoGains = node.getIGValues();
-		}else{
+		Map<String, Integer> totalCount = node.getTargetCount(); //get target counts for node passed in
+		HashMap<String, Double> infoGains; //new hashmap
+		Node nd = node;
+
+		if(nd.getIGValues()!=null){ //if the node contains IG values get them
+			infoGains = nd.getIGValues();
+		}else{ //else initialise new hashmap
 			infoGains = new HashMap<String,Double>();
 		}
-		int s = node.getData().size(); //size of the training data set
+		int s = nd.getData().size(); //size of the training data set
+		double ig=0; //double initialised that will be used to store information gain val
 
-		double ig=0;
-		//gets the entropy of the entire training data set
+		//gets the IG of the entire training data set
 		for(int j: totalCount.values()){
 			double tar = j;
 			double size = s;
 
 			ig += (-tar/size * (Math.log(tar/size)/Math.log(2)));
 		}
-		System.out.println("IG for total set: "+ig);
+		//ent(training data set) - entropy of before after split pt.
+		double infoGain = ig - (entBe*(countb4/s))-(entAf*(countaf/s)); //gets info gain for split value
 
-		double infoGain = ig - (entBe*(countb4/s))-(entAf*(countaf/s));
-
-
+		//if the target attribute doesn't exist add it to hashmap and give it value calculated
 		if(infoGains.get(target)==null){
 			infoGains.put(target, infoGain);
-			System.out.println("Added IG of "+infoGain+" for "+target+" at value "+splitValue);
+			//	System.out.println("Added IG of "+infoGain+" for "+target+" at value "+splitValue);
 			spl = target;
 			val = splitValue;
 		}
+		//only adds information gain for the target attribute if it's greater than the current value
 		if(infoGains.get(target)<infoGain){
 			infoGains.put(target, infoGain);
-			System.out.println("Added IG of "+infoGain+" for "+target+" at value "+splitValue);
+			//	System.out.println("Added IG of "+infoGain+" for "+target+" at value "+splitValue);
 			spl = target;
 			val = splitValue;
 		}
-		node.setIGValues(infoGains); //not needed
-		System.out.println(node.getIGValues().toString()+"\n\n"); //not needed
-
-
+		nd.setIGValues(infoGains); //sets nodes map of IG values to map generated
 	}
 
-	public void splitList(String name, Double v, Node nd, int a){
+	public void splitList(String name, Double v, Node node, int a){
 
+		Node nd = node;
 		int x = attributeIndexes.get(name);
-		Instance.setSortAttribute(x);
+		Instance.setSortAttribute(x); //setting the sorting attribute so list can be split on IG value
 		Collections.sort(nd.getData());
 
+		//new lists to hold instance objects when list passed in is split
 		List<Instance> l1 = new ArrayList<Instance>();
 		List<Instance> l2 = new ArrayList<Instance>();
 
-		System.out.println(a);
-		//System.out.println(b);
 		int i = 0;
 		for (Instance in : nd.getData()){
 
@@ -365,15 +357,16 @@ public class C45 {
 
 			i++;
 		}
-		System.out.println(l1.toString());
-		System.out.println(l2.toString());
-
 		Node n1 = new Node(l1);
-		nd.addChild(n1);
-		runC45(n1);
-
 		Node n2 = new Node(l2);
-		nd.addChild(n2);
-		runC45(n2);
+
+		if( nd.getChildren().length<2){
+			nd.addChild(n1,0);
+			runC45(n1);
+
+
+			nd.addChild(n2,1);
+			runC45(n2);
+		}
 	}
 }
