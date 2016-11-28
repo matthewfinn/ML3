@@ -1,5 +1,8 @@
-package ie.nuigalway;
+/**
+ * Author - Matthew Finn 2016
+ */
 
+package ie.nuigalway;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;

@@ -1,3 +1,6 @@
+/**
+ * Author - Matthew Finn 2016
+ */
 package ie.nuigalway;
 
 import java.awt.Color;
